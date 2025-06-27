@@ -45,10 +45,10 @@ class TicTacToe:
         if button["text"] == " ":
             button.config(text=self.turn)
             if self.turn == "X":
-                button.config(fg="#e74c3c")  # Red X
+                button.config(bg="#e74c3c")  # Red X
                 self.turn = "O"
             else:
-                button.config(fg="#27ae60")  # Green X
+                button.config(bg="#27ae60")  # Green X
                 self.turn = "X"
         self.check_winner()
 
@@ -61,6 +61,7 @@ class TicTacToe:
         for combo in wins:
             if board[combo[0]] == board[combo[1]] == board[combo[2]] and board[combo[0]] != " ":
                 winner = board[combo[0]]
+                self.winner_highlight(combo)
                 self.game_over_message(winner)
                 self.new_game()
                 return
@@ -70,6 +71,11 @@ class TicTacToe:
             self.update_score_display()
             messagebox.showinfo("Game over", "Game tied!")
             self.new_game()
+
+
+    def winner_highlight(self, winning_combo):
+        for index in winning_combo:
+            self.buttons[index].config(bg="red", fg = "white")
 
     def game_over_message(self, result):
         self.game_over = True
