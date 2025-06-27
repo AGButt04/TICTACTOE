@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+import winsound
 
 class TicTacToe:
     def __init__(self):
@@ -46,9 +47,11 @@ class TicTacToe:
             button.config(text=self.turn)
             if self.turn == "X":
                 button.config(bg="#e74c3c")  # Red X
+                self.play_move_sound()
                 self.turn = "O"
             else:
                 button.config(bg="#27ae60")  # Green X
+                self.play_move_sound()
                 self.turn = "X"
         self.check_winner()
 
@@ -73,6 +76,12 @@ class TicTacToe:
             self.new_game()
 
 
+    def play_move_sound(self):
+        winsound.Beep(800,200)
+
+    def play_win_sound(self):
+        winsound.Beep(1000,500)
+
     def winner_highlight(self, winning_combo):
         for index in winning_combo:
             self.buttons[index].config(bg="red", fg = "white")
@@ -83,6 +92,7 @@ class TicTacToe:
             self.x_wins += 1
         else:
             self.o_wins += 1
+        self.play_win_sound()
         messagebox.showinfo("Game Over", f"Player {result} wins!")
         self.update_score_display()
 
