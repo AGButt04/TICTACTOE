@@ -25,9 +25,9 @@ class TicTacToe:
             button = tk.Button(button_frame, text=" ", font=("Arial", 30), width=6, height=2, fg="orange",
                                           command=lambda b=None, idx=i: self.button_clicked(idx))
             if i % 2 == 0:
-                button.config(bg="red")
+                button.config(bg="#3498db")
             else:
-                button.config(bg="green")
+                button.config(bg="#2c3e50")
 
             row = i // 3
             column = i % 3
@@ -45,8 +45,10 @@ class TicTacToe:
         if button["text"] == " ":
             button.config(text=self.turn)
             if self.turn == "X":
+                button.config(fg="#e74c3c")  # Red X
                 self.turn = "O"
             else:
+                button.config(fg="#27ae60")  # Green X
                 self.turn = "X"
         self.check_winner()
 
