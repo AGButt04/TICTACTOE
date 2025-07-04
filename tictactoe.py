@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
+from minimax_AI import TicTacToeAI
 import winsound
+
 
 class TicTacToe:
     def __init__(self):
@@ -12,7 +14,12 @@ class TicTacToe:
         self.o_wins = 0
         self.ties = 0
         self.game_over = False
+        self.ai = TicTacToeAI()
+        self.ai_connection()
         self.build_window()
+
+    def ai_connection(self):
+        print("AI Connected Successfully!")
 
     def build_window(self):
         self.window = tk.Tk()
