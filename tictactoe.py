@@ -20,6 +20,8 @@ class TicTacToe:
 
     def ai_connection(self):
         print("AI Connected Successfully!")
+        initial_board = self.ai.initial_state()
+        print("Initial Board:", initial_board)
 
     def build_window(self):
         self.window = tk.Tk()
