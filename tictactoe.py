@@ -15,25 +15,22 @@ class TicTacToe:
         self.ties = 0
         self.game_over = False
         self.ai = TicTacToeAI()
-        self.game_mode = "human vs human"
+        self.game_mode = "human_vs_human"
         self.ai_player = "O"
-        self.ai_connection()
         self.build_window()
 
     def make_ai_move(self):
-        """Make AI move"""
         if self.game_over:
             return
-
         board_2d = self.buttons_to_board()
         ai_move = self.ai.minimax(board_2d)
-
         if ai_move:
             self.apply_ai_move(ai_move)
-            self.turn = "X"  # Switch back to human
+            self.turn = "X"
             self.check_winner()
 
     def buttons_to_board(self):
+        """Convert buttons to board for the AI to understand"""
         board = []
         for i in range(3):
             row = []
@@ -44,7 +41,7 @@ class TicTacToe:
                     row.append(None)
                 else:
                     row.append(text)
-                board.append(row)
+            board.append(row)
         return board
 
     def apply_ai_move(self, ai_move):
@@ -54,20 +51,15 @@ class TicTacToe:
         button = self.buttons[button_index]
         button.config(text=self.turn)
         button.config(bg="#27ae60")  # Green for O
-        self.play_move_sound()
 
     def set_game_mode(self, mode):
         """Set the game mode and reset the game"""
         self.game_mode = mode
         self.new_game()  # Reset board for new mode
-        print(f"Game mode set to: {mode}")  # For testing
-
-    def ai_connection(self):
-        print("AI Connected Successfully!")
-        initial_board = self.ai.initial_state()
-        print("Initial Board:", initial_board)
 
     def build_window(self):
+        """Build the window"""
+
         self.window = tk.Tk()
         self.window.title("🎮 Tic-Tac-Toe with AI")
         self.window.configure(bg="#2c3e50")  # Dark background
@@ -164,39 +156,51 @@ class TicTacToe:
     def button_clicked(self, button_index):
         if self.game_over:
             return
+
         button = self.buttons[button_index]
         if button["text"] == " ":
             button.config(text=self.turn)
-            self.play_move_sound()
-            self.turn = "O" if self.turn == "X" else "X"
+            if self.turn == "X":
+                button.config(bg="#e74c3c")  # Red X
+                old_turn = "X"
+                self.turn = "O"
+            else:
+                button.config(bg="#27ae60")  # Green O
+                self.turn = "X"
+
             self.check_winner()
 
-            if not self.game_over and self.turn == self.ai_player:
+            should_ai_play = (not self.game_over and
+                              self.game_mode == "human_vs_ai" and
+                              self.turn == self.ai_player)
+
+            if should_ai_play:
+                print("Triggering AI move...")
                 self.window.after(500, self.make_ai_move)
 
     def check_winner(self):
-        board = [button['text'] for button in self.buttons]
-        wins = [[0,1,2], [3,4,5], [6,7,8],
-                [0,3,6], [1,4,7], [2,5,8],
-                [0,4,8], [2,4,6]]
+        board_2d = self.buttons_to_board()
+        winner = self.ai.winner(board_2d)
+        if winner:
+            # Use your existing logic to find and highlight winning combo
+            board = [button['text'] for button in self.buttons]
+            wins = [[0, 1, 2], [3, 4, 5], [6, 7, 8],
+                    [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                    [0, 4, 8], [2, 4, 6]]
+            for combo in wins:
+                if board[combo[0]] == board[combo[1]] == board[combo[2]] == winner:
+                    self.winner_highlight(combo)
+                    break
+            self.game_over_message(winner)
+            self.new_game()
+            return
 
-        for combo in wins:
-            if board[combo[0]] == board[combo[1]] == board[combo[2]] and board[combo[0]] != " ":
-                winner = board[combo[0]]
-                self.winner_highlight(combo)
-                self.game_over_message(winner)
-                self.new_game()
-                return
-
-        if " " not in board:
+        if " " not in [button["text"] for button in self.buttons]:
             self.ties += 1
             self.update_score_display()
             messagebox.showinfo("Game over", "Game tied!")
             self.new_game()
 
-
-    def play_move_sound(self):
-        winsound.Beep(800,200)
 
     def play_win_sound(self):
         winsound.Beep(1000,500)
