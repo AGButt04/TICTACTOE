@@ -1,8 +1,6 @@
 import copy
 import math
 
-print("This file")
-
 class TicTacToeAI:
     def __init__(self):
         self.X = "X"
