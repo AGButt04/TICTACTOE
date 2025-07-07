@@ -15,8 +15,52 @@ class TicTacToe:
         self.ties = 0
         self.game_over = False
         self.ai = TicTacToeAI()
+        self.game_mode = "human vs human"
+        self.ai_player = "O"
         self.ai_connection()
         self.build_window()
+
+    def make_ai_move(self):
+        """Make AI move"""
+        if self.game_over:
+            return
+
+        board_2d = self.buttons_to_board()
+        ai_move = self.ai.minimax(board_2d)
+
+        if ai_move:
+            self.apply_ai_move(ai_move)
+            self.turn = "X"  # Switch back to human
+            self.check_winner()
+
+    def buttons_to_board(self):
+        board = []
+        for i in range(3):
+            row = []
+            for j in range(3):
+                button_index = i * 3 + j
+                text = self.buttons[button_index]["text"]
+                if text == " ":
+                    row.append(None)
+                else:
+                    row.append(text)
+                board.append(row)
+        return board
+
+    def apply_ai_move(self, ai_move):
+        """Take AI move (row, col) and update the GUI"""
+        row, col = ai_move
+        button_index = row * 3 + col
+        button = self.buttons[button_index]
+        button.config(text=self.turn)
+        button.config(bg="#27ae60")  # Green for O
+        self.play_move_sound()
+
+    def set_game_mode(self, mode):
+        """Set the game mode and reset the game"""
+        self.game_mode = mode
+        self.new_game()  # Reset board for new mode
+        print(f"Game mode set to: {mode}")  # For testing
 
     def ai_connection(self):
         print("AI Connected Successfully!")
@@ -25,26 +69,95 @@ class TicTacToe:
 
     def build_window(self):
         self.window = tk.Tk()
-        self.window.title("Tic-Tac-Toe")
-        self.score_label = tk.Label(self.window, text="Score: X:0 O:0 Ties:0")
-        self.score_label.pack(pady = 10)
+        self.window.title("🎮 Tic-Tac-Toe with AI")
+        self.window.configure(bg="#2c3e50")  # Dark background
 
-        button_frame = tk.Frame(self.window)
-        button_frame.pack()
+        # Title
+        title_label = tk.Label(self.window, text="🎮 Tic-Tac-Toe",
+            font=("Arial", 24, "bold"),
+            bg="#2c3e50",
+            fg="#ecf0f1"
+        )
+        title_label.pack(pady=(20, 10))
+
+        # Score label with better styling
+        self.score_label = tk.Label(self.window,text="Score: X:0 O:0 Ties:0",
+            font=("Arial", 14),
+            bg="#2c3e50",
+            fg="#ecf0f1"
+        )
+        self.score_label.pack(pady=5)
+
+        # Game mode section with frame styling
+        mode_frame = tk.Frame(self.window, bg="#2c3e50")
+        mode_frame.pack(pady=15)
+
+        tk.Label(
+            mode_frame,text="Choose Game Mode:", font=("Arial", 14, "bold"),
+            bg="#2c3e50",
+            fg="#ecf0f1"
+        ).pack(pady=(0, 10))
+
+        button_frame_mode = tk.Frame(mode_frame, bg="#2c3e50")
+        button_frame_mode.pack()
+
+        # Styled mode buttons
+        tk.Button(
+            button_frame_mode,
+            text="👥 Human vs Human",
+            command=lambda: self.set_game_mode("human_vs_human"),
+            bg="#3498db",
+            fg="white",
+            font=("Arial", 12, "bold"),
+            padx=20,
+            pady=10,
+            relief="flat",
+            activebackground="#2980b9"
+        ).pack(side=tk.LEFT, padx=10)
+
+        tk.Button(
+            button_frame_mode,
+            text="🤖 Human vs AI",
+            command=lambda: self.set_game_mode("human_vs_ai"),
+            bg="#e74c3c",
+            fg="white",
+            font=("Arial", 12, "bold"),
+            padx=20,
+            pady=10,
+            relief="flat",
+            activebackground="#c0392b"
+        ).pack(side=tk.LEFT, padx=10)
+
+        # Game board with frame
+        board_container = tk.Frame(self.window, bg="#2c3e50")
+        board_container.pack(pady=20)
+
+        button_frame = tk.Frame(board_container, bg="#34495e", relief="raised", bd=2)
+        button_frame.pack(padx=20, pady=20)
+
         for i in range(9):
-            button = tk.Button(button_frame, text=" ", font=("Arial", 30), width=6, height=2, fg="orange",
-                                          command=lambda b=None, idx=i: self.button_clicked(idx))
+            button = tk.Button(
+                button_frame,
+                text=" ",
+                font=("Arial", 30, "bold"),
+                width=4,
+                height=2,
+                fg="orange",
+                command=lambda idx=i: self.button_clicked(idx),
+                relief="flat",
+                bd=2
+            )
             if i % 2 == 0:
-                button.config(bg="#3498db")
+                button.config(bg="#3498db", activebackground="#2980b9")
             else:
-                button.config(bg="#2c3e50")
+                button.config(bg="#2c3e50", activebackground="#34495e")
 
             row = i // 3
             column = i % 3
-            button.grid(row=row, column=column, padx=5, pady=5)
+            button.grid(row=row, column=column, padx=3, pady=3)
             self.buttons.append(button)
 
-        self.window.geometry("500x500")
+        self.window.geometry("600x700")
         self.window.resizable(False, False)
         self.window.mainloop()
 
@@ -54,15 +167,12 @@ class TicTacToe:
         button = self.buttons[button_index]
         if button["text"] == " ":
             button.config(text=self.turn)
-            if self.turn == "X":
-                button.config(bg="#e74c3c")  # Red X
-                self.play_move_sound()
-                self.turn = "O"
-            else:
-                button.config(bg="#27ae60")  # Green X
-                self.play_move_sound()
-                self.turn = "X"
-        self.check_winner()
+            self.play_move_sound()
+            self.turn = "O" if self.turn == "X" else "X"
+            self.check_winner()
+
+            if not self.game_over and self.turn == self.ai_player:
+                self.window.after(500, self.make_ai_move)
 
     def check_winner(self):
         board = [button['text'] for button in self.buttons]
