@@ -7,19 +7,6 @@ class TicTacToeAI:
         self.O = "O"
         self.EMPTY = None
 
-    def initial_state(self):
-        """
-        Returns starting state of the board.
-        """
-        board = [[self.EMPTY] * 3 for _ in range(3)]
-        return board
-
-    def get_best_move(self, board):
-        """
-        Main interface method - converts board and returns the best move.
-        """
-        pass
-
     def player(self, board):
         x_count = sum(row.count("X") for row in board)
         o_count = sum(row.count("O") for row in board)
@@ -61,7 +48,6 @@ class TicTacToeAI:
             [(0, 0), (1, 1), (2, 2)],
             [(0, 2), (1, 1), (2, 0)]
         ]
-
         for combo in winning_combinations:
             first = combo[0]
             second = combo[1]
@@ -101,6 +87,9 @@ class TicTacToeAI:
             return None
 
     def minimax(self, board):
+        """
+            Returns the best action after calling minimax_value recursively
+        """
         if self.terminal(board):
             return None
 
@@ -124,6 +113,11 @@ class TicTacToeAI:
         return best_action
 
     def minimax_value(self, board, depth):
+        """
+            Uses use action from a state and generate all possible
+            models and returns the min and max values according to
+            the player at turn.
+        """
         if self.terminal(board):
             return self.utility(board) * (10 - depth)
 
@@ -139,39 +133,3 @@ class TicTacToeAI:
                 value = self.minimax_value(self.result(board, action), depth + 1)
                 best_value = min(best_value, value)
             return best_value
-
-
-# Test the implementation
-if __name__ == "__main__":
-    ai = TicTacToeAI()
-    board1 = [
-        ["X", "X", None],
-        ["O", None, None],
-        [None, None, None]
-    ]
-    print("Test 1 - AI as O should block X:")
-    print("Current player:", ai.player(board1))  # Should print: O
-    print("AI move:", ai.minimax(board1))  # Should print: (0,2)
-    print("Expected: (0, 2) to block X diagonal")
-    # Simple test cases for TicTacToeAI
-
-    board2 = [
-        ["X", "X", None],
-        ["O", "O", None],
-        [None, None, None]
-    ]
-    print("Test 1 - AI (O) should block at (0, 2):")
-    print("Current player:", ai.player(board2))  # O
-    print("AI move:", ai.minimax(board2))  # Expected: (0, 2)
-    print()
-
-    board3 = [
-        ["X", "O", "X"],
-        ["X", "O", "X"],
-        [None, None, "O"]
-    ]
-    print("Test 3 - AI (X) should pick a strategic move (2, 1):")
-    print("Current player:", ai.player(board3))  # X
-    print("AI move:", ai.minimax(board3))  # Expected: corner or best available
-    print()
-
