@@ -6,6 +6,7 @@ import winsound
 
 class TicTacToe:
     def __init__(self):
+        self.status_label = None
         self.window = None
         self.score_label = None
         self.turn = "X"
@@ -28,6 +29,7 @@ class TicTacToe:
             self.apply_ai_move(ai_move)
             self.turn = "X"
             self.check_winner()
+        self.status_label.config(text="")
 
     def buttons_to_board(self):
         """Convert buttons to board for the AI to understand"""
@@ -55,6 +57,7 @@ class TicTacToe:
     def set_game_mode(self, mode):
         """Set the game mode and reset the game"""
         self.game_mode = mode
+        self.play_beep_sound()
         self.new_game()  # Reset board for new mode
 
     def build_window(self):
@@ -79,13 +82,21 @@ class TicTacToe:
             fg="#ecf0f1"
         )
         self.score_label.pack(pady=5)
+        self.status_label = tk.Label(
+            self.window,
+            text="",  # Start empty
+            font=("Arial", 14, "italic"),
+            bg="#2c3e50",
+            fg="#f39c12"  # Orange color
+        )
+        self.status_label.pack(pady=5)
 
         # Game mode section with frame styling
         mode_frame = tk.Frame(self.window, bg="#2c3e50")
-        mode_frame.pack(pady=15)
+        mode_frame.pack(pady=10)
 
         tk.Label(
-            mode_frame,text="Choose Game Mode:", font=("Arial", 14, "bold"),
+            mode_frame,text="Choose Game Mode:", font=("Arial", 18, "bold"),
             bg="#2c3e50",
             fg="#ecf0f1"
         ).pack(pady=(0, 10))
@@ -100,7 +111,7 @@ class TicTacToe:
             command=lambda: self.set_game_mode("human_vs_human"),
             bg="#3498db",
             fg="white",
-            font=("Arial", 12, "bold"),
+            font=("Arial", 15, "bold"),
             padx=20,
             pady=10,
             relief="flat",
@@ -113,7 +124,7 @@ class TicTacToe:
             command=lambda: self.set_game_mode("human_vs_ai"),
             bg="#e74c3c",
             fg="white",
-            font=("Arial", 12, "bold"),
+            font=("Arial", 15, "bold"),
             padx=20,
             pady=10,
             relief="flat",
@@ -122,7 +133,7 @@ class TicTacToe:
 
         # Game board with frame
         board_container = tk.Frame(self.window, bg="#2c3e50")
-        board_container.pack(pady=20)
+        board_container.pack(pady=10)
 
         button_frame = tk.Frame(board_container, bg="#34495e", relief="raised", bd=2)
         button_frame.pack(padx=20, pady=20)
@@ -131,7 +142,7 @@ class TicTacToe:
             button = tk.Button(
                 button_frame,
                 text=" ",
-                font=("Arial", 30, "bold"),
+                font=("Arial", 28, "bold"),
                 width=4,
                 height=2,
                 fg="orange",
@@ -175,8 +186,10 @@ class TicTacToe:
                               self.turn == self.ai_player)
 
             if should_ai_play:
-                print("Triggering AI move...")
+                self.status_label.config(text="🤖 Computer thinking...")
+                self.window.update()
                 self.window.after(500, self.make_ai_move)
+                self.play_beep_sound()
 
     def check_winner(self):
         board_2d = self.buttons_to_board()
@@ -204,6 +217,9 @@ class TicTacToe:
 
     def play_win_sound(self):
         winsound.Beep(1000,500)
+
+    def play_beep_sound(self):
+        winsound.Beep(500,200)
 
     def winner_highlight(self, winning_combo):
         for index in winning_combo:
