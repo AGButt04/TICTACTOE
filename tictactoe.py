@@ -173,7 +173,6 @@ class TicTacToe:
             button.config(text=self.turn)
             if self.turn == "X":
                 button.config(bg="#e74c3c")  # Red X
-                old_turn = "X"
                 self.turn = "O"
             else:
                 button.config(bg="#27ae60")  # Green O
@@ -241,8 +240,12 @@ class TicTacToe:
     def new_game(self):
         self.game_over = False
         self.turn = "X"
-        for button in self.buttons:
+        for i, button in enumerate(self.buttons):
             button.config(text=" ")
+            if i % 2 == 0:
+                button.config(bg="#3498db", activebackground="#2980b9")
+            else:
+                button.config(bg="#2c3e50", activebackground="#34495e")
 
 
 # Run the game
